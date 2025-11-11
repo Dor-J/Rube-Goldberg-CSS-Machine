@@ -35,20 +35,31 @@ app.innerHTML = `
         >
           <div class="shape tube" aria-hidden="true"></div>
 
-          <div class="shape coil" aria-hidden="true">
-            <svg viewBox="0 0 150 240" role="presentation" aria-hidden="true">
-              <path
-                class="coil-back"
-                d="M75 18 C 135 18 135 78 75 78 S 15 138 75 138 S 125 198 75 198 S 45 230 75 230"
-              ></path>
-              <path
-                class="coil-front"
-                d="M75 18 C 135 18 135 78 75 78 S 20 138 75 138 S 120 188 75 188 S 50 228 75 228"
-              ></path>
-            </svg>
-            <div class="coil-cap" aria-hidden="true"></div>
-            <div class="coil-tail" aria-hidden="true"></div>
-          </div>
+      <div class="shape coil" aria-hidden="true">
+        <svg viewBox="0 0 150 240" role="presentation" aria-hidden="true">
+          <g class="loops" transform="translate(75,40)">
+            <g class="loop">
+              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
+              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
+            </g>
+            <g class="loop" transform="translate(0,60)">
+              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
+              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
+            </g>
+            <g class="loop" transform="translate(0,120)">
+              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
+              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
+            </g>
+            <g class="loop" transform="translate(0,180)">
+              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
+              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
+            </g>
+          </g>
+        </svg>
+        <div class="coil-inlet" aria-hidden="true"></div>
+        <div class="coil-cap" aria-hidden="true"></div>
+        <div class="coil-tail" aria-hidden="true"></div>
+      </div>
 
           <div class="shape ramp" aria-hidden="true"></div>
           <div class="shape ramp-block" aria-hidden="true"></div>
@@ -73,17 +84,13 @@ app.innerHTML = `
           <div class="shape slide" aria-hidden="true">
             <div class="berm" aria-hidden="true"></div>
             <div class="hole" aria-hidden="true"></div>
-            <svg
-              viewBox="0 0 300 90"
-              class="wave"
-              role="presentation"
-              aria-hidden="true"
-            >
-              <path d="M10 60 Q60 15 110 60 T210 60 T290 60"></path>
+            <svg viewBox="0 0 300 90" class="wave" role="presentation" aria-hidden="true">
+              <path d="M10 60 Q60 20 110 60 T210 60 T290 60"></path>
             </svg>
           </div>
 
           <div class="ball b-coil" aria-hidden="true"></div>
+          <div class="ball b-funnel" aria-hidden="true"></div>
           <div class="ball b-tube" aria-hidden="true"></div>
           <div class="ball b-ring" aria-hidden="true"></div>
           <div class="ball b-exit" aria-hidden="true"></div>
