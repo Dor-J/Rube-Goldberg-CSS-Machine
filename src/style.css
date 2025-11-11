@@ -29,6 +29,7 @@
     --canvas-h: 480;
 
     --bg: #e3ddd5;
+    --page-max: 1200px;
     --blue: #61a8ff;
     --orange: #e86833;
     --orange-dark: #d07b2f;
@@ -37,6 +38,19 @@
     --white: #ffffff;
     --light-gray: #d7d1c8;
     --ramp-gray: #d9d6cf;
+    --text-muted: #5b534a;
+    --header-bg: #f6f2ec;
+    --footer-bg: #dcd4c7;
+    --link-color: #2449a9;
+
+    --space-xs: 0.25rem;
+    --space-s: 0.5rem;
+    --space-m: 1rem;
+    --space-l: 1.5rem;
+    --space-xl: 2.75rem;
+    --radius-l: 24px;
+    --shadow-soft: 0 35px 80px rgba(20, 20, 20, 0.12);
+    --gradient-soft: linear-gradient(135deg, #fcf8f2 0%, #ece4d8 100%);
 
     --stroke-thin: 1px;
     --outline: rgba(0, 0, 0, 0.12);
@@ -50,8 +64,8 @@
     --t-ring: 1.1s;
     --t-slide: 1.8s;
     --loop: calc(
-      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) + var(--t-ring) +
-        var(--t-slide)
+      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) +
+        var(--t-ring) + var(--t-slide)
     );
 
     /* timeline checkpoints */
@@ -60,7 +74,8 @@
     --d2: calc(var(--t-coil) + var(--t-ramp) + var(--t-funnel));
     --d3: calc(var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube));
     --d4: calc(
-      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) + var(--t-ring)
+      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) +
+        var(--t-ring)
     );
   }
 }
@@ -68,13 +83,155 @@
 /* -------------------- BASE -------------------- */
 @layer base {
   body {
-    display: grid;
-    place-items: center;
     min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--black);
+    margin: 0;
+  }
+
+  .page {
+    min-height: 100vh;
+    width: min(var(--page-max), 100%);
+    margin: 0 auto;
+    padding: clamp(var(--space-l), 4vw, var(--space-xl));
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-l), 4vw, var(--space-xl));
+  }
+
+  .site-header {
+    background: var(--gradient-soft);
+    border-radius: var(--radius-l);
+    padding: clamp(var(--space-l), 4vw, var(--space-xl));
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .site-header h1 {
+    margin: 0;
+    font-size: clamp(2.2rem, 4vw, 3rem);
+  }
+
+  .site-header .lede {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .eyebrow {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.5rem;
+    background: var(--black);
+    color: var(--white);
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 15px 30px rgba(20, 20, 20, 0.25);
+    border: 2px solid transparent;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(20, 20, 20, 0.2);
+  }
+
+  .cta:focus-visible {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 4px rgba(97, 168, 255, 0.35);
+  }
+
+  .ghost-link {
+    text-decoration: none;
+    color: var(--link-color);
+    font-weight: 600;
+    position: relative;
+  }
+
+  .ghost-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transform-origin: left;
+    transform: scaleX(0.4);
+    transition: transform 200ms ease;
+  }
+
+  .ghost-link:hover::after,
+  .ghost-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  .site-main {
+    display: flex;
+    justify-content: center;
+  }
+
+  .site-footer {
+    background: var(--footer-bg);
+    border-radius: var(--radius-l);
+    padding: var(--space-m) clamp(var(--space-m), 4vw, var(--space-l));
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: flex;
+    justify-content: center;
+
+    p {
+      color: var(--link-color);
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover,
+      &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page {
+      padding: var(--space-l);
+    }
+
+    .header-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .header-actions .cta {
+      width: 100%;
+    }
   }
 
   .stage {
-    width: min(92vw, 1040px);
+    width: min(100%, 1040px);
     aspect-ratio: calc(var(--canvas-w) / var(--canvas-h));
     background: var(--bg);
     border-radius: 16px;
@@ -443,20 +600,46 @@
 
 /* -------------------- SCENE ORDERING -------------------- */
 @layer scene {
-  .tube { z-index: 10; }
-  .tube::after { z-index: 11; }
-  .coil { z-index: 12; }
-  .funnel { z-index: 7; }
-  .ring-assembly { z-index: 8; }
-  .slide { z-index: 6; }
+  .tube {
+    z-index: 10;
+  }
+  .tube::after {
+    z-index: 11;
+  }
+  .coil {
+    z-index: 12;
+  }
+  .funnel {
+    z-index: 7;
+  }
+  .ring-assembly {
+    z-index: 8;
+  }
+  .slide {
+    z-index: 6;
+  }
   .ramp,
-  .ramp-block { z-index: 5; }
-  .funnel .mouth { z-index: 3; }
-  .funnel .body { z-index: 2; }
-  .funnel .confetti { z-index: 4; }
-  .slide .wave { z-index: 3; }
-  .slide .berm { z-index: 1; }
-  .slide .hole { z-index: 2; }
+  .ramp-block {
+    z-index: 5;
+  }
+  .funnel .mouth {
+    z-index: 3;
+  }
+  .funnel .body {
+    z-index: 2;
+  }
+  .funnel .confetti {
+    z-index: 4;
+  }
+  .slide .wave {
+    z-index: 3;
+  }
+  .slide .berm {
+    z-index: 1;
+  }
+  .slide .hole {
+    z-index: 2;
+  }
 }
 
 /* ==================== MOTION: CORE ==================== */
@@ -475,8 +658,8 @@
 .ball.b-coil {
   left: 40px;
   top: 165px;
-  animation: coil-segment var(--t-coil) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d0)
-    infinite both;
+  animation: coil-segment var(--t-coil) cubic-bezier(0.25, 0.1, 0.25, 1)
+    var(--d0) infinite both;
   z-index: 35;
 }
 @keyframes coil-segment {
@@ -524,8 +707,7 @@
     opacity: 1;
   }
   60% {
-    transform: translateY(-24px) scale(1)
-      rotate(calc(var(--r, 8deg) * -1));
+    transform: translateY(-24px) scale(1) rotate(calc(var(--r, 8deg) * -1));
     opacity: 1;
   }
   100% {
@@ -563,8 +745,8 @@
 .ball.b-ring {
   left: 720px;
   top: 92px;
-  animation: ring-pass var(--t-ring) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d3) infinite
-    both;
+  animation: ring-pass var(--t-ring) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d3)
+    infinite both;
 }
 @keyframes ring-pass {
   0% {
@@ -593,8 +775,8 @@
   top: 335px;
   offset-path: path('M10 60 Q60 15 110 60 T210 60 T290 60');
   offset-rotate: auto;
-  animation: slide-exit var(--t-slide) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d4) infinite
-    both;
+  animation: slide-exit var(--t-slide) cubic-bezier(0.25, 0.1, 0.25, 1)
+    var(--d4) infinite both;
 }
 @keyframes slide-exit {
   0% {
@@ -648,7 +830,8 @@
   animation: piston-right2 var(--t-ring) ease-out var(--d3) infinite both;
 }
 .ring-assembly .p3 {
-  animation: piston-right3 var(--t-ring) ease-out calc(var(--d3) + 0.08s) infinite both;
+  animation: piston-right3 var(--t-ring) ease-out calc(var(--d3) + 0.08s)
+    infinite both;
 }
 
 @keyframes piston-left {
