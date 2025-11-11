@@ -1,0 +1,715 @@
+﻿/* -------------------- LAYERS -------------------- */
+@layer reset, tokens, base, components, scene;
+
+/* -------------------- RESET -------------------- */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: #e3ddd5;
+    color: #141414;
+  }
+}
+
+/* -------------------- TOKENS -------------------- */
+@layer tokens {
+  :root {
+    --canvas-w: 960;
+    --canvas-h: 480;
+
+    --bg: #e3ddd5;
+    --blue: #61a8ff;
+    --orange: #e86833;
+    --orange-dark: #d07b2f;
+    --yellow: #e0a91e;
+    --black: #141414;
+    --white: #ffffff;
+    --light-gray: #d7d1c8;
+    --ramp-gray: #d9d6cf;
+
+    --stroke-thin: 1px;
+    --outline: rgba(0, 0, 0, 0.12);
+
+    /* animation hooks for later wiring */
+    /* Motion timings + derived delays */
+    --t-coil: 2.4s;
+    --t-ramp: 1.1s;
+    --t-funnel: 1.2s;
+    --t-tube: 1.4s; /* explicit; matches implementation */
+    --t-ring: 1.1s;
+    --t-slide: 1.8s;
+    --loop: calc(
+      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) + var(--t-ring) +
+        var(--t-slide)
+    );
+
+    /* timeline checkpoints */
+    --d0: 0s;
+    --d1: var(--t-coil);
+    --d2: calc(var(--t-coil) + var(--t-ramp) + var(--t-funnel));
+    --d3: calc(var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube));
+    --d4: calc(
+      var(--t-coil) + var(--t-ramp) + var(--t-funnel) + var(--t-tube) + var(--t-ring)
+    );
+  }
+}
+
+/* -------------------- BASE -------------------- */
+@layer base {
+  body {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+  }
+
+  .stage {
+    width: min(92vw, 1040px);
+    aspect-ratio: calc(var(--canvas-w) / var(--canvas-h));
+    background: var(--bg);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(20, 20, 20, 0.12);
+    container-type: size;
+    --sx: calc(100cqw / var(--canvas-w));
+    --sy: calc(100cqh / var(--canvas-h));
+    --scale: min(var(--sx), var(--sy));
+  }
+
+  .machine {
+    position: absolute;
+    inset: 0;
+    transform-origin: 0 0;
+    transform: scale(var(--scale));
+  }
+
+  .shape {
+    position: absolute;
+  }
+
+  .ball {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: 0 0 0 var(--stroke-thin) var(--outline);
+    z-index: 40;
+
+    /* hooks for future animations */
+    --segment-duration: 1.2s;
+    --segment-delay: 0s;
+    animation-duration: var(--segment-duration);
+    animation-delay: var(--segment-delay);
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+    animation-play-state: running;
+  }
+}
+
+/* -------------------- COMPONENTS -------------------- */
+@layer components {
+  /* Capsule tube */
+  .tube {
+    left: 60px;
+    top: 70px;
+    width: 410px;
+    height: 65px;
+    border-radius: 32px;
+    background: var(--blue);
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .tube::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 120px;
+    background: radial-gradient(
+      80% 75% at 100% 50%,
+      rgba(20, 20, 20, 0.9) 0 62%,
+      transparent 70%
+    );
+  }
+
+  .tube::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+  }
+
+  /* Coil */
+  .coil {
+    left: 40px;
+    top: 165px;
+    width: 150px;
+    height: 230px;
+    z-index: 12;
+  }
+
+  .coil svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .coil path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .coil .coil-back {
+    stroke: var(--black);
+    stroke-width: 10;
+    stroke-dasharray: 28 38;
+    stroke-dashoffset: 10;
+    opacity: 0.92;
+  }
+
+  .coil .coil-front {
+    stroke: var(--blue);
+    stroke-width: 16;
+  }
+
+  .coil-cap {
+    position: absolute;
+    left: 58px;
+    top: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: 0 0 0 4px var(--blue);
+  }
+
+  .coil-tail {
+    position: absolute;
+    left: 4px;
+    bottom: 8px;
+    width: 52px;
+    height: 14px;
+    border-radius: 7px;
+    background: var(--blue);
+  }
+
+  /* Ramp */
+  .ramp {
+    left: 210px;
+    top: 315px;
+    width: 85px;
+    height: 65px;
+    background: var(--orange-dark);
+    clip-path: polygon(0 100%, 100% 0, 100% 100%);
+    z-index: 5;
+  }
+
+  .ramp-block {
+    left: 295px;
+    top: 315px;
+    width: 28px;
+    height: 65px;
+    background: var(--ramp-gray);
+    z-index: 6;
+  }
+
+  /* Funnel */
+  .funnel {
+    left: 335px;
+    top: 170px;
+    width: 180px;
+    height: 210px;
+    z-index: 7;
+  }
+
+  .funnel .mouth {
+    position: absolute;
+    left: 15px;
+    top: 0;
+    width: 150px;
+    height: 44px;
+    border-radius: 999px;
+    background: var(--yellow);
+    box-shadow: inset 0 -6px 0 var(--orange);
+    z-index: 2;
+  }
+
+  .funnel .body {
+    position: absolute;
+    left: 35px;
+    top: 36px;
+    width: 110px;
+    height: 164px;
+    background: var(--orange);
+    clip-path: path(
+      'M0,0 H110 C100,36 96,60 82,96 C70,124 70,150 80,164 H32 C42,148 42,120 32,100 C20,76 12,36 0,0 Z'
+    );
+    z-index: 1;
+  }
+
+  .funnel .confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    z-index: 3;
+    transform: rotate(var(--r, 0deg));
+  }
+
+  .funnel .c1 {
+    left: 20px;
+    top: -12px;
+    background: var(--blue);
+    --r: 18deg;
+  }
+
+  .funnel .c2 {
+    left: 70px;
+    top: -18px;
+    background: #c94c2e;
+    --r: -12deg;
+  }
+
+  .funnel .c3 {
+    left: 120px;
+    top: -22px;
+    background: var(--white);
+    --r: 24deg;
+  }
+
+  .funnel .c4 {
+    left: 150px;
+    top: -6px;
+    width: 10px;
+    height: 18px;
+    background: var(--blue);
+    --r: -6deg;
+  }
+
+  /* Ring + pole + pistons */
+  .ring-assembly {
+    left: 720px;
+    top: 92px;
+    width: 180px;
+    height: 242px;
+    z-index: 8;
+  }
+
+  .ring-assembly .circle {
+    position: absolute;
+    left: 27px;
+    top: 0;
+    width: 126px;
+    height: 126px;
+    border: 12px solid var(--yellow);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  }
+
+  .ring-assembly .pole {
+    position: absolute;
+    left: 82px;
+    top: 112px;
+    width: 20px;
+    height: 120px;
+    background: var(--yellow);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+  }
+
+  .ring-assembly .piston {
+    position: absolute;
+    width: 54px;
+    height: 18px;
+    background: var(--light-gray);
+    border-radius: 9px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  .ring-assembly .piston::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+
+  .ring-assembly .p1 {
+    left: -6px;
+    top: 140px;
+  }
+
+  .ring-assembly .p2 {
+    left: 130px;
+    top: 132px;
+    transform: rotate(8deg);
+  }
+
+  .ring-assembly .p3 {
+    left: 136px;
+    top: 176px;
+    transform: rotate(-6deg);
+  }
+
+  /* Slide */
+  .slide {
+    left: 620px;
+    top: 335px;
+    width: 300px;
+    height: 90px;
+    z-index: 6;
+  }
+
+  .slide .berm {
+    position: absolute;
+    left: 6px;
+    top: 36px;
+    width: 200px;
+    height: 52px;
+    background: var(--light-gray);
+    border-radius: 30px;
+    transform: skewX(-8deg);
+    z-index: 1;
+  }
+
+  .slide .hole {
+    position: absolute;
+    left: 34px;
+    top: 52px;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--black);
+    opacity: 0.95;
+    z-index: 2;
+  }
+
+  .slide svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+  }
+
+  .slide path {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 14;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Balls in their static placements */
+  .ball.b-tube {
+    left: 370px;
+    top: 82px;
+  }
+
+  .ball.b-coil {
+    left: 78px;
+    top: 210px;
+  }
+
+  .ball.b-ring {
+    left: 818px;
+    top: 162px;
+  }
+
+  .ball.b-exit {
+    left: 736px;
+    top: 360px;
+  }
+}
+
+/* -------------------- SCENE ORDERING -------------------- */
+@layer scene {
+  .tube { z-index: 10; }
+  .tube::after { z-index: 11; }
+  .coil { z-index: 12; }
+  .funnel { z-index: 7; }
+  .ring-assembly { z-index: 8; }
+  .slide { z-index: 6; }
+  .ramp,
+  .ramp-block { z-index: 5; }
+  .funnel .mouth { z-index: 3; }
+  .funnel .body { z-index: 2; }
+  .funnel .confetti { z-index: 4; }
+  .slide .wave { z-index: 3; }
+  .slide .berm { z-index: 1; }
+  .slide .hole { z-index: 2; }
+}
+
+/* ==================== MOTION: CORE ==================== */
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ball,
+  .funnel .confetti,
+  .ring-assembly .piston,
+  .tube::after {
+    animation: none !important;
+  }
+}
+
+/* ---- A) COIL segment (spiral-ish descent → heads toward funnel) ---- */
+.ball.b-coil {
+  left: 40px;
+  top: 165px;
+  animation: coil-segment var(--t-coil) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d0)
+    infinite both;
+  z-index: 35;
+}
+@keyframes coil-segment {
+  0% {
+    transform: translate(60px, 8px) rotate(0turn);
+    opacity: 1;
+  }
+  15% {
+    transform: translate(84px, 48px) rotate(0.35turn);
+  }
+  30% {
+    transform: translate(32px, 92px) rotate(0.75turn);
+  }
+  45% {
+    transform: translate(86px, 136px) rotate(1.15turn);
+  }
+  60% {
+    transform: translate(22px, 176px) rotate(1.45turn);
+    opacity: 0.98;
+  }
+  75% {
+    transform: translate(120px, 198px) rotate(1.7turn);
+  }
+  90% {
+    transform: translate(185px, 78px) rotate(1.9turn);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(205px, 132px) rotate(2.05turn);
+    opacity: 0;
+  }
+}
+
+/* Confetti burst at the funnel mouth (brief, on coil handoff) */
+.funnel .confetti {
+  --burst: 0.42s;
+  animation: confetti-pop var(--burst) ease-out var(--d1) infinite both;
+}
+@keyframes confetti-pop {
+  0% {
+    transform: translateY(0) scale(0.6) rotate(var(--r, 8deg));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  60% {
+    transform: translateY(-24px) scale(1)
+      rotate(calc(var(--r, 8deg) * -1));
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-34px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ---- B) TUBE segment (motion path inside capsule) ---- */
+.ball.b-tube {
+  left: 60px;
+  top: 70px;
+  offset-path: path('M 18 32 C 150 32 285 32 392 32');
+  offset-rotate: 0deg;
+  animation: tube-travel var(--t-tube) linear var(--d2) infinite both;
+  z-index: 42;
+}
+@keyframes tube-travel {
+  from {
+    offset-distance: 0%;
+    transform: translate(0, -17px);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  to {
+    offset-distance: 100%;
+    transform: translate(0, -17px);
+    opacity: 1;
+  }
+}
+
+/* ---- C) RING segment (enter, pulse, drop along pole) ---- */
+.ball.b-ring {
+  left: 720px;
+  top: 92px;
+  animation: ring-pass var(--t-ring) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d3) infinite
+    both;
+}
+@keyframes ring-pass {
+  0% {
+    transform: translate(44px, 56px) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    transform: translate(90px, 56px) scale(1.06);
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--yellow), transparent 82%);
+  }
+  60% {
+    transform: translate(90px, 56px) scale(1.1);
+  }
+  100% {
+    transform: translate(90px, 178px) scale(0.96);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* ---- D) SLIDE segment (wavy path + roll + end bounce) ---- */
+.ball.b-exit {
+  left: 620px;
+  top: 335px;
+  offset-path: path('M10 60 Q60 15 110 60 T210 60 T290 60');
+  offset-rotate: auto;
+  animation: slide-exit var(--t-slide) cubic-bezier(0.25, 0.1, 0.25, 1) var(--d4) infinite
+    both;
+}
+@keyframes slide-exit {
+  0% {
+    offset-distance: 0%;
+    transform: rotate(0turn) translate(-17px, -17px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    offset-distance: 82%;
+    transform: rotate(0.8turn) translate(-17px, -17px);
+  }
+  92% {
+    offset-distance: 96%;
+    transform: rotate(0.95turn) translate(-17px, calc(-17px - 10px));
+  }
+  100% {
+    offset-distance: 100%;
+    transform: rotate(1turn) translate(-17px, -17px);
+  }
+}
+
+/* ==================== ENHANCEMENTS ==================== */
+
+/* 1) Tube shadow parallax (moves subtly opposite the ball) */
+.tube::after {
+  animation: tube-shadow-parallax var(--t-tube) linear var(--d2) infinite both;
+}
+@keyframes tube-shadow-parallax {
+  0% {
+    transform: translateX(0px);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateX(-22px);
+    opacity: 0.86;
+  }
+  100% {
+    transform: translateX(-36px);
+    opacity: 0.8;
+  }
+}
+
+/* 2) Pistons “fire” when the ball hits the ring (timed to ring-pass) */
+.ring-assembly .p1 {
+  animation: piston-left var(--t-ring) ease-out var(--d3) infinite both;
+}
+.ring-assembly .p2 {
+  animation: piston-right2 var(--t-ring) ease-out var(--d3) infinite both;
+}
+.ring-assembly .p3 {
+  animation: piston-right3 var(--t-ring) ease-out calc(var(--d3) + 0.08s) infinite both;
+}
+
+@keyframes piston-left {
+  0%,
+  30% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(-14px);
+  }
+  60%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes piston-right2 {
+  0%,
+  30% {
+    transform: rotate(8deg) translateX(0);
+  }
+  45% {
+    transform: rotate(8deg) translateX(16px);
+  }
+  60%,
+  100% {
+    transform: rotate(8deg) translateX(0);
+  }
+}
+
+@keyframes piston-right3 {
+  0%,
+  35% {
+    transform: rotate(-6deg) translateX(0);
+  }
+  50% {
+    transform: rotate(-6deg) translateX(12px);
+  }
+  65%,
+  100% {
+    transform: rotate(-6deg) translateX(0);
+  }
+}
+
+/* piston tip flash for a tactile feel */
+.ring-assembly .piston::after {
+  animation: piston-tip var(--t-ring) ease-out var(--d3) infinite both;
+}
+@keyframes piston-tip {
+  0%,
+  35% {
+    transform: scale(1);
+    filter: none;
+  }
+  50% {
+    transform: scale(1.2);
+    filter: brightness(1.1);
+  }
+  65%,
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
+}
