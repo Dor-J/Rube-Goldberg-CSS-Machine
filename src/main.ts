@@ -33,29 +33,8 @@ app.innerHTML = `
           role="img"
           aria-label="Blue capsule tube, spiral coil, ramp, funnel, ring assembly, wavy slide and four cue balls"
         >
-          <div class="shape tube" aria-hidden="true"></div>
+                    <div class="shape tube" aria-hidden="true"></div>
 
-      <div class="shape coil" aria-hidden="true">
-        <svg viewBox="0 0 150 240" role="presentation" aria-hidden="true">
-          <g class="loops" transform="translate(75,40)">
-            <g class="loop">
-              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
-              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
-            </g>
-            <g class="loop" transform="translate(0,60)">
-              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
-              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
-            </g>
-            <g class="loop" transform="translate(0,120)">
-              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
-              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
-            </g>
-            <g class="loop" transform="translate(0,180)">
-              <ellipse class="back" pathLength="100" rx="52" ry="28" cx="0" cy="0"></ellipse>
-              <ellipse class="front" rx="52" ry="28" cx="0" cy="0"></ellipse>
-            </g>
-          </g>
-        </svg>
         <div class="coil-inlet" aria-hidden="true"></div>
         <div class="coil-cap" aria-hidden="true"></div>
         <div class="coil-tail" aria-hidden="true"></div>
